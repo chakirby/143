@@ -56,6 +56,19 @@ def baseline(qbow, sentences, stopwords):
     # Return the best answer
     best_answer = (answers[0])[1]    
     return best_answer
+	
+def get_question(question):
+	return str(re.search(r'Question: "(.*)"', question).group(1))
+	
+def process_questions(text, stopwords):
+	#questions = []
+	for question in re.split(r'\.\n', text):
+		#questions.append(get_question(question))
+		current_question = get_question(question)
+		qbow = get_bow(get_sentences(question)[0], stopwords)
+		sentences = get_sentences(text)
+		answer = baseline(qbow, sentences, stopwords)
+		
 
 if __name__ == '__main__':
     text_file = "fables-01.sch"
@@ -63,10 +76,11 @@ if __name__ == '__main__':
     stopwords = set(nltk.corpus.stopwords.words("english"))
     text = read_file(text_file)
     question = "Where was the crow sitting?"
-
-    qbow = get_bow(get_sentences(question)[0], stopwords)
-    sentences = get_sentences(text)
 	
-    answer = baseline(qbow, sentences, stopwords)
+	process_questions(text, stopwords)
+    #qbow = get_bow(get_sentences(question)[0], stopwords)
+    #sentences = get_sentences(text)
+	
+    #answer = baseline(qbow, sentences, stopwords)
 	
     print(" ".join(t[0] for t in answer))
