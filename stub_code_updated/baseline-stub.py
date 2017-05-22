@@ -6,7 +6,7 @@ Created on May 14, 2014
 Modified on May 21, 2015
 '''
 
-import sys, nltk, operator
+import sys, nltk, operator, re
 
 # Read the file from disk
 def read_file(filename):
@@ -57,30 +57,46 @@ def baseline(qbow, sentences, stopwords):
     best_answer = (answers[0])[1]    
     return best_answer
 	
-def get_question(question):
-	return str(re.search(r'Question: "(.*)"', question).group(1))
+#def get_question(question):
+#    #quest = re.compile('Question: "(.*)"')
+#    #test = quest.findall(quest)
+#    test = re.search(r'Question: "(.*)"', question)
+#    print(test)
+#    return ""#str(test.group(1))
 	
-def process_questions(text, stopwords):
-	#questions = []
-	for question in re.split(r'\.\n', text):
-		#questions.append(get_question(question))
-		current_question = get_question(question)
-		qbow = get_bow(get_sentences(question)[0], stopwords)
-		sentences = get_sentences(text)
-		answer = baseline(qbow, sentences, stopwords)
-		
-
+def process_questions(text, question_text, stopwords):
+    #questions = []
+    #for question in re.split(r'\.\n', question_text):
+    text_list = question_text.splitlines()
+    question_list = []
+    for line in text_list:
+        #questions.append(get_question(question))
+        #print(line)
+        current_question_re = re.search(r'Question: (.*)', line)
+        if current_question_re is not None:
+            current_question = current_question_re.group(1)
+            print(current_question)
+            
+        #current_question = get_question(line)
+        
+        #the below things are used on a question sentence itself
+        #qbow = get_bow(get_sentences(line)[0], stopwords)
+        #sentences = get_sentences(text)
+        #answer = baseline(qbow, sentences, stopwords)
+        
 if __name__ == '__main__':
     text_file = "fables-01.sch"
+    question_file = "fables-01.questions"
 	
     stopwords = set(nltk.corpus.stopwords.words("english"))
     text = read_file(text_file)
-    question = "Where was the crow sitting?"
+    question_text = read_file(question_file)
+    #question = "Where was the crow sitting?"
 	
-	process_questions(text, stopwords)
+    answer = process_questions(text, question_text, stopwords)
     #qbow = get_bow(get_sentences(question)[0], stopwords)
     #sentences = get_sentences(text)
 	
     #answer = baseline(qbow, sentences, stopwords)
 	
-    print(" ".join(t[0] for t in answer))
+    #print(" ".join(t[0] for t in answer))
