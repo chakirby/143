@@ -65,24 +65,35 @@ def baseline(qbow, sentences, stopwords):
 #    return ""#str(test.group(1))
 	
 def process_questions(text, question_text, stopwords):
-    #questions = []
-    #for question in re.split(r'\.\n', question_text):
     text_list = question_text.splitlines()
+    id_list = [] #three separate lists, but they'll be added to in order so indexing will be the same
     question_list = []
+    type_list = []
     for line in text_list:
-        #questions.append(get_question(question))
-        #print(line)
+        current_id_re = re.search(r'QuestionID: (.*)', line)#lots of short searches, don't really need regex but lol
         current_question_re = re.search(r'Question: (.*)', line)
-        if current_question_re is not None:
+        current_type_re = re.search(r'Type: (.*)', line)
+        if current_id_re is not None:
+            id_list.append(current_id_re.group(1))
+        elif current_question_re is not None:
             current_question = current_question_re.group(1)
-            print(current_question)
-            
-        #current_question = get_question(line)
-        
+            question_list.append(current_question)
+        elif current_type_re is not None:
+            if "Sch" in line: #try to use sch if can
+                type_list.append("Sch")
+            else:
+                type_list.append("Story")
+    
+    for i in range(len(id_list)):
+        #print(id_list[i] + question_list[i] + type_list[i])
         #the below things are used on a question sentence itself
-        #qbow = get_bow(get_sentences(line)[0], stopwords)
-        #sentences = get_sentences(text)
-        #answer = baseline(qbow, sentences, stopwords)
+        qbow = get_bow(get_sentences(question_list[i])[0], stopwords)
+        sentences = get_sentences(text)
+        answer = baseline(qbow, sentences, stopwords)
+        answer_sentence = ""
+        for word in answer:
+            answer_sentence = answer_sentence + word[0] + " "
+        print("Question ID: " + id_list[i] + "\nAnswer: " + answer_sentence + "\n")
         
 if __name__ == '__main__':
     text_file = "fables-01.sch"
